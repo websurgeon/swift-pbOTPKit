@@ -12,8 +12,4 @@ final class PBOTPKitTests: XCTestCase {
         // results.
         XCTAssertEqual(PBOTPKit().text, "Hello, World!")
     }
-
-    static var allTests = [
-        ("testExample", testExample),
-    ]
 }

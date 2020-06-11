@@ -4,8 +4,4 @@
 
 import XCTest
 
-import PBOTPKitTests
-
-var tests = [XCTestCaseEntry]()
-tests += PBOTPKitTests.allTests()
-XCTMain(tests)
+fatalError("Run the tests with `swift test --enable-test-discovery`.")
