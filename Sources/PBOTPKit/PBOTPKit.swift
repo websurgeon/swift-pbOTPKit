@@ -3,5 +3,7 @@
 //
 
 import PBHOTPGenerator
+import PBTOTPGenerator
 
 public typealias HOTPGenerator = PBHOTPGenerator.HOTPGenerator
+public typealias TOTPGenerator = PBTOTPGenerator.TOTPGenerator

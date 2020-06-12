@@ -13,6 +13,9 @@ let package = Package(
         .library(
             name: "PBHOTPGenerator",
             targets: ["PBHOTPGenerator"]),
+        .library(
+              name: "PBTOTPGenerator",
+              targets: ["PBTOTPGenerator"]),
     ],
     dependencies: [
         // Dependencies declare other packages that this package depends on.
@@ -23,7 +26,7 @@ let package = Package(
         // Targets can depend on other targets in this package, and on products in packages which this package depends on.
         .target(
             name: "PBOTPKit",
-            dependencies: ["PBHOTPGenerator"]),
+            dependencies: ["PBHOTPGenerator", "PBTOTPGenerator"]),
         .testTarget(
             name: "PBOTPKitTests",
             dependencies: ["PBOTPKit"]),
@@ -33,5 +36,11 @@ let package = Package(
         .testTarget(
             name: "PBHOTPGeneratorTests",
             dependencies: ["PBHOTPGenerator"]),
+        .target(
+            name: "PBTOTPGenerator",
+            dependencies: ["PBHOTPGenerator"]),
+        .testTarget(
+            name: "PBTOTPGeneratorTests",
+            dependencies: ["PBTOTPGenerator"]),
     ]
 )

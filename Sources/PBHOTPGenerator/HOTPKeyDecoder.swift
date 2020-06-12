@@ -9,7 +9,7 @@ enum HOTPKeyDecoderError: Error {
     case invalidKey
 }
 
-enum HOTPKeyDecoder {
+public enum HOTPKeyDecoder {
     public static func decode(_ encodedKey: String) throws -> Data {
         guard let data = encodedKey.data(using: .ascii) else {
             throw HOTPKeyDecoderError.invalidKey
