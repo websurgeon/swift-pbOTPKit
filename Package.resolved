@@ -1,0 +1,16 @@
+{
+  "object": {
+    "pins": [
+      {
+        "package": "PBBase32",
+        "repositoryURL": "https://github.com/websurgeon/swift-pbBase32.git",
+        "state": {
+          "branch": null,
+          "revision": "95bb832521b3ab2fb331f92c7dd860305d5f8c64",
+          "version": "1.1.0"
+        }
+      }
+    ]
+  },
+  "version": 1
+}

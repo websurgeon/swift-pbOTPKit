@@ -10,19 +10,28 @@ let package = Package(
         .library(
             name: "PBOTPKit",
             targets: ["PBOTPKit"]),
+        .library(
+            name: "PBHOTPGenerator",
+            targets: ["PBHOTPGenerator"]),
     ],
     dependencies: [
         // Dependencies declare other packages that this package depends on.
-        // .package(url: /* package url */, from: "1.0.0"),
+        .package(name: "PBBase32", url: "https://github.com/websurgeon/swift-pbBase32.git", from: "1.1.0"),
     ],
     targets: [
         // Targets are the basic building blocks of a package. A target can define a module or a test suite.
         // Targets can depend on other targets in this package, and on products in packages which this package depends on.
         .target(
             name: "PBOTPKit",
-            dependencies: []),
+            dependencies: ["PBHOTPGenerator"]),
         .testTarget(
             name: "PBOTPKitTests",
             dependencies: ["PBOTPKit"]),
+        .target(
+            name: "PBHOTPGenerator",
+            dependencies: ["PBBase32"]),
+        .testTarget(
+            name: "PBHOTPGeneratorTests",
+            dependencies: ["PBHOTPGenerator"]),
     ]
 )
