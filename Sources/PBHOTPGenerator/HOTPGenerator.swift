@@ -24,39 +24,67 @@ public enum HOTPGenerator {
         counter: Int,
         digits: Int = 6
     ) -> String {
-        
-        // Cast key data to NSData to use convenience methods to get bytes and length
-        let keyData = key as NSData
-
-        // Convert counter to big endian format
-        var counterValue = UInt(counter).bigEndian
-        
-        // Create message for generating Hmac
-        let messageLength = MemoryLayout.size(ofValue: counterValue)
-        let message = Data(bytes: &counterValue, count: messageLength) as NSData
-
-        // Create 20 byte container for hmac value
-        var hmac = [UInt8](repeating: 0, count: 20)
-        
-        // Generate HMAC-SHA-1 value
-        CCHmac(CCHmacAlgorithm(kCCHmacAlgSHA1),
-               keyData.bytes, keyData.length,
-               message.bytes, message.length,
-               &hmac)
-        
-        // Find dynamic offset using low-order 4-bits of last byte
-        let offset = Int(hmac[hmac.count - 1] & 0xf)
-        
-        // Construct 4-byte binary code value starting at offset
-        let binaryCode: Int = (Int(hmac[offset    ] & 0x7f) << 24) |
-                              (Int(hmac[offset + 1] & 0xff) << 16) |
-                              (Int(hmac[offset + 2] & 0xff) << 8) |
-                              (Int(hmac[offset + 3] & 0xff))
-        
-        // Limit code range to be 0..<10^{digits}
-        let decimalCode = binaryCode % Int(pow(Double(10), Double(digits)))
-        
-        // return string code with fixed 'digits' length (padded with zeros)
-        return String(format: "%0\(digits)i", decimalCode)
+        let hmac = generateHmacSha1(
+            key: key as NSData,
+            message: createMessage(from: counter))
+                
+        return stringCode(from: hmac, fixedLength: digits)
     }
 }
+
+extension HOTPGenerator {
+    static func createMessage(from counter: Int) -> NSData {
+        var counterValue = UInt(counter).bigEndian
+
+        let messageLength = MemoryLayout.size(ofValue: counterValue)
+        
+        return Data(bytes: &counterValue, count: messageLength) as NSData
+    }
+
+    static func generateHmacSha1(key: NSData, message: NSData) -> [UInt8] {
+        var hmac = [UInt8](repeating: 0, count: 20)
+        
+        CCHmac(CCHmacAlgorithm(kCCHmacAlgSHA1),
+               key.bytes, key.length,
+               message.bytes, message.length,
+               &hmac)
+
+        return hmac
+    }
+
+    static func findInitialByteOffset(for hmac: [UInt8]) -> Int {
+        return Int(hmac[hmac.count - 1] & 0xf)
+    }
+
+    static func binaryCode(from hmac: [UInt8]) -> Int {
+        let offset = findInitialByteOffset(for: hmac)
+        
+        let byte1 = Int(hmac[offset    ] & 0x7f) << 24
+        let byte2 = Int(hmac[offset + 1] & 0xff) << 16
+        let byte3 = Int(hmac[offset + 2] & 0xff) << 8
+        let byte4 = Int(hmac[offset + 3] & 0xff)
+        
+        return byte1 | byte2 | byte3 | byte4
+    }
+
+    static func limit(_ binaryCode: Int, toDigits digits: Int) -> Int {
+        return binaryCode % Int(pow(Double(10), Double(digits)))
+    }
+    
+    static func stringCode(
+        from decimalCode: Int,
+        fixedLength digits: Int
+    ) -> String {
+        return String(format: "%0\(digits)i", decimalCode)
+    }
+    
+    static func stringCode(
+        from hmac: [UInt8],
+        fixedLength digits: Int
+    ) -> String {
+        return stringCode(
+            from: limit(binaryCode(from: hmac), toDigits: digits),
+            fixedLength: digits)
+    }
+}
+
