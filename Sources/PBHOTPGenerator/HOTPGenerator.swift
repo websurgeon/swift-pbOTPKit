@@ -32,7 +32,10 @@ public enum HOTPGenerator {
     }
 }
 
+// MARK: Helpers
+
 extension HOTPGenerator {
+    
     static func createMessage(from counter: Int) -> NSData {
         var counterValue = UInt(counter).bigEndian
 
