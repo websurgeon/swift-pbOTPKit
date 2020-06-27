@@ -13,6 +13,8 @@ final class HOTPGenerator_helperTests: XCTestCase {
     
     let findInitialByteOffset = HOTPGenerator.findInitialByteOffset
     
+    let binaryCode = HOTPGenerator.binaryCode
+    
     // MARK: createMessage
     
     func test_createMessage_shouldReturnBigEndianDataRepresentation() {
@@ -107,7 +109,41 @@ final class HOTPGenerator_helperTests: XCTestCase {
         XCTAssertEqual(
         findInitialByteOffset([0xab]), 0x0b)
     }
+    
+    // MARK: binaryCode
+    
+    func test_binaryCode_shouldReturnUnsignedValueOf4BytesFromOffset() {
+        let hmac: [UInt8] = [
+            0xff, 0xfe, 0xfd, 0xfc,
+            0xfb, 0xfa, 0xf9, 0xf8,
+            0xf7, 0xf6, 0xf5, 0xf4,
+            0xf3, 0xf2, 0xf1, 0xf0,
+            0xef, 0xee, 0xed, 0xec
+        ]
+        
+        let removeSignBit = 0x7fffffff
+        XCTAssertEqual(binaryCode(hmac, 0x00), 0xfffefdfc & removeSignBit)
+        XCTAssertEqual(binaryCode(hmac, 0x01), 0xfefdfcfb & removeSignBit)
+        XCTAssertEqual(binaryCode(hmac, 0x02), 0xfdfcfbfa & removeSignBit)
+        XCTAssertEqual(binaryCode(hmac, 0x03), 0xfcfbfaf9 & removeSignBit)
+        XCTAssertEqual(binaryCode(hmac, 0x04), 0xfbfaf9f8 & removeSignBit)
+        XCTAssertEqual(binaryCode(hmac, 0x05), 0xfaf9f8f7 & removeSignBit)
+        XCTAssertEqual(binaryCode(hmac, 0x06), 0xf9f8f7f6 & removeSignBit)
+        XCTAssertEqual(binaryCode(hmac, 0x07), 0xf8f7f6f5 & removeSignBit)
+        XCTAssertEqual(binaryCode(hmac, 0x08), 0xf7f6f5f4 & removeSignBit)
+        XCTAssertEqual(binaryCode(hmac, 0x09), 0xf6f5f4f3 & removeSignBit)
+        XCTAssertEqual(binaryCode(hmac, 0x0a), 0xf5f4f3f2 & removeSignBit)
+        XCTAssertEqual(binaryCode(hmac, 0x0b), 0xf4f3f2f1 & removeSignBit)
+        XCTAssertEqual(binaryCode(hmac, 0x0c), 0xf3f2f1f0 & removeSignBit)
+        XCTAssertEqual(binaryCode(hmac, 0x0d), 0xf2f1f0ef & removeSignBit)
+        XCTAssertEqual(binaryCode(hmac, 0x0e), 0xf1f0efee & removeSignBit)
+        XCTAssertEqual(binaryCode(hmac, 0x0f), 0xf0efeeed & removeSignBit)
+    }
 }
 
-
+precedencegroup PowerPrecedence { higherThan: MultiplicationPrecedence }
+infix operator ^^ : PowerPrecedence
+fileprivate func ^^ (lhs: Int, rhs: Int) -> Int {
+    return Int(pow(Double(lhs), Double(rhs)))
+}
 

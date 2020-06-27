@@ -59,14 +59,12 @@ extension HOTPGenerator {
         return Int(hmac[hmac.count - 1] & 0xf)
     }
 
-    static func binaryCode(from hmac: [UInt8]) -> Int {
-        let offset = findInitialByteOffset(for: hmac)
-        
+    static func binaryCode(from hmac: [UInt8], at offset: Int) -> Int {
         let byte1 = Int(hmac[offset    ] & 0x7f) << 24
         let byte2 = Int(hmac[offset + 1] & 0xff) << 16
         let byte3 = Int(hmac[offset + 2] & 0xff) << 8
         let byte4 = Int(hmac[offset + 3] & 0xff)
-        
+
         return byte1 | byte2 | byte3 | byte4
     }
 
@@ -85,8 +83,10 @@ extension HOTPGenerator {
         from hmac: [UInt8],
         fixedLength digits: Int
     ) -> String {
+        let offset = findInitialByteOffset(for: hmac)
+
         return stringCode(
-            from: limit(binaryCode(from: hmac), toDigits: digits),
+            from: limit(binaryCode(from: hmac, at: offset), toDigits: digits),
             fixedLength: digits)
     }
 }
