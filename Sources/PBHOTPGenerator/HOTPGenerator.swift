@@ -28,7 +28,13 @@ public enum HOTPGenerator {
             key: key as NSData,
             message: createMessage(from: counter))
                 
-        return stringCode(from: hmac, fixedLength: digits)
+        let offset = findInitialByteOffset(for: hmac)
+        
+        let code = binaryCode(from: hmac, at: offset)
+        
+        return zeroPaddedString(
+            for: limit(code, toDigits: digits),
+            fixedLength: digits)
     }
 }
 
@@ -72,22 +78,11 @@ extension HOTPGenerator {
         return binaryCode % Int(pow(Double(10), Double(digits)))
     }
     
-    static func stringCode(
-        from decimalCode: Int,
+    static func zeroPaddedString(
+        for decimalCode: Int,
         fixedLength digits: Int
     ) -> String {
         return String(format: "%0\(digits)i", decimalCode)
-    }
-    
-    static func stringCode(
-        from hmac: [UInt8],
-        fixedLength digits: Int
-    ) -> String {
-        let offset = findInitialByteOffset(for: hmac)
-
-        return stringCode(
-            from: limit(binaryCode(from: hmac, at: offset), toDigits: digits),
-            fixedLength: digits)
     }
 }
 

@@ -15,6 +15,13 @@ final class HOTPGenerator_helperTests: XCTestCase {
     
     let binaryCode = HOTPGenerator.binaryCode
     
+    let limit = HOTPGenerator.limit
+    
+    let zeroPaddedString: (
+        _ decimalCode: Int,
+        _ digits: Int
+    ) -> String = HOTPGenerator.zeroPaddedString
+    
     // MARK: createMessage
     
     func test_createMessage_shouldReturnBigEndianDataRepresentation() {
@@ -138,6 +145,53 @@ final class HOTPGenerator_helperTests: XCTestCase {
         XCTAssertEqual(binaryCode(hmac, 0x0d), 0xf2f1f0ef & removeSignBit)
         XCTAssertEqual(binaryCode(hmac, 0x0e), 0xf1f0efee & removeSignBit)
         XCTAssertEqual(binaryCode(hmac, 0x0f), 0xf0efeeed & removeSignBit)
+    }
+    
+    // MARK: limit
+
+    func test_limit_shouldReturnLeastSignificantDigits() {
+        XCTAssertEqual(limit(9876543210, 10), 9876543210)
+        XCTAssertEqual(limit(9876543210, 9),   876543210)
+        XCTAssertEqual(limit(9876543210, 8),    76543210)
+        XCTAssertEqual(limit(9876543210, 7),     6543210)
+        XCTAssertEqual(limit(9876543210, 6),      543210)
+        XCTAssertEqual(limit(9876543210, 5),       43210)
+        XCTAssertEqual(limit(9876543210, 4),        3210)
+        XCTAssertEqual(limit(9876543210, 3),         210)
+        XCTAssertEqual(limit(9876543210, 2),          10)
+        XCTAssertEqual(limit(9876543210, 1),           0)
+    }
+    
+    // MARK: zeroPaddedString
+
+    func test_zeroPaddedString_shouldReturnZeroPaddedNumberAsString() {
+        XCTAssertEqual(zeroPaddedString(0, 1),           "0")
+        XCTAssertEqual(zeroPaddedString(0, 2),          "00")
+        XCTAssertEqual(zeroPaddedString(0, 3),         "000")
+        XCTAssertEqual(zeroPaddedString(0, 4),        "0000")
+        XCTAssertEqual(zeroPaddedString(0, 5),       "00000")
+        XCTAssertEqual(zeroPaddedString(0, 6),      "000000")
+        XCTAssertEqual(zeroPaddedString(0, 7),     "0000000")
+        XCTAssertEqual(zeroPaddedString(0, 8),    "00000000")
+        XCTAssertEqual(zeroPaddedString(0, 9),   "000000000")
+        XCTAssertEqual(zeroPaddedString(0, 10), "0000000000")
+        
+        XCTAssertEqual(zeroPaddedString(1, 1),           "1")
+        XCTAssertEqual(zeroPaddedString(1, 2),          "01")
+        XCTAssertEqual(zeroPaddedString(1, 3),         "001")
+        XCTAssertEqual(zeroPaddedString(1, 4),        "0001")
+        XCTAssertEqual(zeroPaddedString(1, 5),       "00001")
+        XCTAssertEqual(zeroPaddedString(1, 6),      "000001")
+        XCTAssertEqual(zeroPaddedString(1, 7),     "0000001")
+        XCTAssertEqual(zeroPaddedString(1, 8),    "00000001")
+        XCTAssertEqual(zeroPaddedString(1, 9),   "000000001")
+        XCTAssertEqual(zeroPaddedString(1, 10), "0000000001")
+        
+        XCTAssertEqual(zeroPaddedString(123456, 6), "123456")
+        XCTAssertEqual(zeroPaddedString(12345,  6), "012345")
+        XCTAssertEqual(zeroPaddedString(1234,   6), "001234")
+        XCTAssertEqual(zeroPaddedString(123,    6), "000123")
+        XCTAssertEqual(zeroPaddedString(12,     6), "000012")
     }
 }
 
