@@ -37,7 +37,7 @@ let keyData = "12345678901234567890".data(using: .utf8)!
 
 let date = Date() // 2020-06-12 21:36:30 +0000
 
-let code = HOTPGenerator.generate(key: keyData, date: date) // "871676"
+let code = TOTPGenerator.generate(key: keyData, date: date) // "871676"
 
 ```
 Using Google Authenticator Base32 encoded key string:
@@ -48,7 +48,7 @@ let encodedKey = "GEZDGNBVGY3TQOJQGEZDGNBVGY3TQOJQ" // Base32 "12345678901234567
 
 let date = Date() // 2020-06-12 21:36:30 +0000
 
-let code = HOTPGenerator.generate(encodedKey: encodedKey, date: date) // "871676"
+let code = TOTPGenerator.generate(encodedKey: encodedKey, date: date) // "871676"
 
 ```
 
